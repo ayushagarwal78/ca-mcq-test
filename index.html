@@ -1,1 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>CA MCQ Test</title>
 
+<style>
+body{
+font-family:Arial;
+background:linear-gradient(135deg,#141e30,#243b55);
+color:white;
+text-align:center;
+}
+
+.box{
+background:white;
+color:black;
+width:90%;
+max-width:700px;
+margin:auto;
+padding:20px;
+border-radius:15px;
+margin-top:30px;
+}
+
+button{
+padding:10px 15px;
+margin:10px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+}
+
+.start{background:green;color:white;font-size:18px;}
+
+.opt{
+padding:10px;
+margin:8px;
+border:1px solid #ccc;
+cursor:pointer;
+}
+.opt:hover{background:#eee;}
+</style>
+
+</head>
+
+<body>
+
+<div class="box" id="loginBox">
+<h2>Login</h2>
+<input id="user" placeholder="Username"><br><br>
+<input id="pass" type="password" placeholder="Password"><br><br>
+<button class="start" onclick="login()">Login</button>
+</div>
+
+<div class="box" id="startBox" style="display:none;">
+<h1>CA MCQ Test</h1>
+<button class="start" onclick="startTest()">Start Test</button>
+</div>
+
+<div class="box" id="testBox" style="display:none;">
+<h3>Time: <span id="time">100:00</span></h3>
+<h2 id="qno"></h2>
+<p id="question"></p>
+<div id="options"></div>
+
+<button onclick="nextQ()">Next</button>
+<button onclick="submitTest()">Submit</button>
+</div>
+
+<div class="box" id="resultBox" style="display:none;">
+<h1>Result</h1>
+<h2 id="score"></h2>
+<h1 id="emoji"></h1>
+</div>
+
+<script>
+
+let questions = [
+  {q:"2+2=?", o:["3","4","5","6"], a:1},
+  {q:"Capital of India?", o:["Mumbai","Delhi","Kolkata","Chennai"], a:1}
+];
+
+let current=0;
+let ans=[];
+let time=6000;
+
+function login(){
+document.getElementById("loginBox").style.display="none";
+document.getElementById("startBox").style.display="block";
+}
+
+function startTest(){
+document.getElementById("startBox").style.display="none";
+document.getElementById("testBox").style.display="block";
+loadQ();
+timer();
+}
+
+function loadQ(){
+let q=questions[current];
+document.getElementById("qno").innerText="Q"+(current+1);
+document.getElementById("question").innerText=q.q;
+
+let html="";
+q.o.forEach((v,i)=>{
+html+=`<div class='opt' onclick='select(${i})'>${v}</div>`;
+});
+document.getElementById("options").innerHTML=html;
+}
+
+function select(i){
+ans[current]=i;
+}
+
+function nextQ(){
+if(current<questions.length-1){
+current++;
+loadQ();
+}
+}
+
+function submitTest(){
+let score=0;
+
+for(let i=0;i<questions.length;i++){
+if(ans[i]==questions[i].a) score++;
+else score-=0.25;
+}
+
+document.getElementById("testBox").style.display="none";
+document.getElementById("resultBox").style.display="block";
+
+document.getElementById("score").innerText=score;
+
+if(score>1) document.getElementById("emoji").innerText="🔥";
+else document.getElementById("emoji").innerText="😐";
+}
+
+function timer(){
+setInterval(()=>{
+time--;
+let m=Math.floor(time/60);
+let s=time%60;
+document.getElementById("time").innerText=m+":"+s;
+if(time<=0) submitTest();
+},1000);
+}
+
+</script>
+
+</body>
+</html>
