@@ -1,0 +1,136 @@
+Bilkul 👍 ye lo final updated code — isko poora copy karke GitHub ke bade box me paste kar do 👇
+JavaScript
+import React, { useState, useEffect } from "react";
+
+export default function App() {
+  const TOTAL_TIME = 100 * 60;
+
+  const generateQuestions = () => {
+    let arr = [];
+    for (let i = 1; i <= 120; i++) {
+      arr.push({
+        question: `Question ${i}: Sample MCQ?`,
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        answer: 1,
+      });
+    }
+    return arr;
+  };
+
+  const [started, setStarted] = useState(false);
+  const [selected, setSelected] = useState([]);
+  const [submitted, setSubmitted] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
+
+  const questions = generateQuestions();
+
+  useEffect(() => {
+    if (timeLeft > 0 && !submitted && started) {
+      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+    if (timeLeft === 0) setSubmitted(true);
+  }, [timeLeft, submitted, started]);
+
+  const handleSelect = (qIndex, optionIndex) => {
+    const newSelected = [...selected];
+    newSelected[qIndex] = optionIndex;
+    setSelected(newSelected);
+  };
+
+  const calculateResult = () => {
+    let score = 0;
+    let correct = 0;
+    let wrong = 0;
+
+    questions.forEach((q, i) => {
+      if (selected[i] === q.answer) {
+        score += 1;
+        correct++;
+      } else if (selected[i] !== undefined) {
+        score -= 0.25;
+        wrong++;
+      }
+    });
+
+    return { score, correct, wrong };
+  };
+
+  const formatTime = (sec) => {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}m ${s}s`;
+  };
+
+  if (!started) {
+    return (
+      <div style={{ textAlign: "center", padding: "20px" }}>
+        <h1>CA Mock Test</h1>
+        <p>120 Questions | 100 Minutes</p>
+        <button
+          onClick={() => {
+            setStarted(true);
+            setSelected(Array(120).fill(undefined));
+          }}
+        >
+          Start Test
+        </button>
+      </div>
+    );
+  }
+
+  const result = calculateResult();
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <h2>CA Full Test</h2>
+      <p>⏱ {formatTime(timeLeft)}</p>
+
+      <div style={{ maxHeight: "60vh", overflowY: "scroll" }}>
+        {questions.map((q, qIndex) => (
+          <div key={qIndex} style={{ marginBottom: "15px" }}>
+            <p>
+              {qIndex + 1}. {q.question}
+            </p>
+            {q.options.map((opt, i) => (
+              <label key={i} style={{ display: "block" }}>
+                <input
+                  type="radio"
+                  name={`q-${qIndex}`}
+                  onChange={() => handleSelect(qIndex, i)}
+                  disabled={submitted}
+                />
+                {opt}
+              </label>
+            ))}
+          </div>
+        ))}
+      </div>
+
+      {!submitted ? (
+        <button onClick={() => setSubmitted(true)}>Submit</button>
+      ) : (
+        <div>
+          <h3>Result</h3>
+          <p>Score: {result.score}</p>
+          <p>Correct: {result.correct}</p>
+          <p>Wrong: {result.wrong}</p>
+
+          {result.score >= questions.length * 0.75 ? (
+            <p>🔥 Excellent 😍🎉</p>
+          ) : result.score >= questions.length * 0.4 ? (
+            <p>👍 Average 🙂</p>
+          ) : (
+            <p>😢 Poor Performance 💔</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+✅ Ab kya karo:
+Ye code copy karo
+GitHub me App.js file me paste karo
+Commit changes dabao
+👉 Jab ho jaye bolo: "code upload ho gaya"
+Phir main tumhe live website (Vercel) pe le jaunga 🚀
