@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CA MCQ Test</title>
+</head>
+<body>
+  <h1>CA MCQ Test</h1>
+  <button onclick="startTest()">Start Test</button>
+
+  <div id="quiz"></div>
+  <div id="result"></div>
+
+  <script>
+    let questions = [];
+    for (let i = 1; i <= 120; i++) {
+      questions.push({
+        q: "Question " + i,
+        options: ["A", "B", "C", "D"],
+        ans: 1
+      });
+    }
+
+    let answers = [];
+
+    function startTest() {
+      let html = "";
+      questions.forEach((q, i) => {
+        html += `<p>${i+1}. ${q.q}</p>`;
+        q.options.forEach((opt, j) => {
+          html += `<input type='radio' name='q${i}' onclick='answers[${i}]=${j}'> ${opt}<br>`;
+        });
+      });
+      html += "<button onclick='submitTest()'>Submit</button>";
+      document.getElementById("quiz").innerHTML = html;
+    }
+
+    function submitTest() {
+      let score = 0;
+      questions.forEach((q, i) => {
+        if (answers[i] == q.ans) score++;
+        else if (answers[i] != undefined) score -= 0.25;
+      });
+
+      document.getElementById("result").innerHTML = "Score: " + score;
+    }
+  </script>
+</body>
+</html>
