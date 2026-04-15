@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>CA MCQ Pro</title>
+<title>CA MCQ PRO</title>
 
 <style>
 body{
@@ -12,21 +12,18 @@ color:white;
 text-align:center;
 }
 
-/* GLASS BOX */
 .box{
 background:rgba(255,255,255,0.12);
-backdrop-filter:blur(10px);
-border:1px solid rgba(255,255,255,0.2);
+backdrop-filter:blur(12px);
 width:90%;
-max-width:700px;
+max-width:750px;
 margin:auto;
-padding:25px;
+margin-top:25px;
+padding:20px;
 border-radius:18px;
-margin-top:30px;
-box-shadow:0 10px 30px rgba(0,0,0,0.4);
+box-shadow:0 10px 30px rgba(0,0,0,0.5);
 }
 
-/* INPUT */
 input{
 padding:12px;
 width:80%;
@@ -36,25 +33,21 @@ border:none;
 outline:none;
 }
 
-/* BUTTONS */
 button{
 padding:12px 18px;
-margin:8px;
+margin:6px;
 border:none;
 border-radius:10px;
 cursor:pointer;
-font-size:15px;
-transition:0.3s;
+transition:0.2s;
 }
 
-button:hover{
-transform:scale(1.05);
-}
+button:hover{transform:scale(1.05);}
 
-/* COLORS */
 .start{background:#22c55e;color:white;}
 .next{background:#3b82f6;color:white;}
 .submit{background:#ef4444;color:white;}
+
 .opt{
 background:white;
 color:black;
@@ -64,33 +57,48 @@ border-radius:10px;
 cursor:pointer;
 transition:0.2s;
 }
+
+/* 🔥 SELECTED OPTION COLOR */
+.selected{
+background:#facc15 !important;
+color:black;
+font-weight:bold;
+}
+
 .opt:hover{
 background:#e0f2fe;
 }
 
-/* TITLE */
-h1{
-font-size:32px;
-}
+h1{font-size:28px;}
 </style>
-
 </head>
 
 <body>
 
+<!-- LOGIN -->
 <div class="box" id="loginBox">
-<h1>📘 CA MCQ TEST</h1>
-<h3>Login</h3>
-<input id="user" placeholder="Username"><br>
-<input id="pass" type="password" placeholder="Password"><br>
+<h1>📘 CA MCQ LOGIN</h1>
+
+<input id="phone" placeholder="📱 Phone Number"><br>
+<input id="email" placeholder="📧 Email"><br>
+<input id="pass" type="password" placeholder="🔑 Password"><br>
+
+<button class="start" onclick="sendOTP()">Send OTP</button><br>
+
+<input id="otp" placeholder="Enter OTP"><br>
+
 <button class="start" onclick="login()">Login</button>
+<br>
+<button onclick="forgot()">Forgot Password</button>
 </div>
 
+<!-- START -->
 <div class="box" id="startBox" style="display:none;">
-<h1>🚀 Ready for Exam?</h1>
+<h1>🚀 Start CA MCQ Test</h1>
 <button class="start" onclick="startTest()">Start Test</button>
 </div>
 
+<!-- TEST -->
 <div class="box" id="testBox" style="display:none;">
 <h3>⏱ Time Left: <span id="time">100:00</span></h3>
 
@@ -103,6 +111,7 @@ font-size:32px;
 <button class="submit" onclick="submitTest()">Submit ✅</button>
 </div>
 
+<!-- RESULT -->
 <div class="box" id="resultBox" style="display:none;">
 <h1>📊 Result</h1>
 <h2 id="score"></h2>
@@ -111,18 +120,62 @@ font-size:32px;
 
 <script>
 
-let questions = [
-  {q:"2+2=?", o:["3","4","5","6"], a:1},
-  {q:"Capital of India?", o:["Mumbai","Delhi","Kolkata","Chennai"], a:1}
+let questions=[
+ {q:"2+2=?",o:["3","4","5","6"],a:1},
+ {q:"Capital of India?",o:["Mumbai","Delhi","Kolkata","Chennai"],a:1}
 ];
 
 let current=0;
 let ans=[];
 let time=6000;
 
+let generatedOTP="";
+let savedPass="";
+
+function sendOTP(){
+let phone=document.getElementById("phone").value;
+let email=document.getElementById("email").value;
+
+if(!phone || !email){
+alert("Enter phone & email");
+return;
+}
+
+generatedOTP=Math.floor(100000+Math.random()*900000);
+
+// 🔥 SIMULATED EMAIL OTP (REAL ME EMAILJS USE HOGA)
+alert("OTP sent to email: "+email+"\nOTP: "+generatedOTP);
+}
+
 function login(){
+let otp=document.getElementById("otp").value;
+let pass=document.getElementById("pass").value;
+
+if(otp!=generatedOTP){
+alert("Wrong OTP");
+return;
+}
+
+/* 🔒 PASSWORD LOCK SYSTEM */
+if(savedPass==""){
+savedPass=pass;
+localStorage.setItem("pass",pass);
+}
+else{
+if(pass!=localStorage.getItem("pass")){
+alert("This account already has a fixed password!");
+return;
+}
+}
+
 document.getElementById("loginBox").style.display="none";
 document.getElementById("startBox").style.display="block";
+}
+
+function forgot(){
+localStorage.removeItem("pass");
+savedPass="";
+alert("Password reset done. Login again.");
 }
 
 function startTest(){
@@ -139,13 +192,20 @@ document.getElementById("question").innerText=q.q;
 
 let html="";
 q.o.forEach((v,i)=>{
-html+=`<div class='opt' onclick='select(${i})'>${v}</div>`;
+html+=`<div class='opt' onclick='select(this,${i})'>${v}</div>`;
 });
+
 document.getElementById("options").innerHTML=html;
 }
 
-function select(i){
+/* 🎨 OPTION SELECT COLOR */
+function select(el,i){
 ans[current]=i;
+
+let opts=document.querySelectorAll(".opt");
+opts.forEach(o=>o.classList.remove("selected"));
+
+el.classList.add("selected");
 }
 
 function nextQ(){
@@ -168,15 +228,11 @@ document.getElementById("resultBox").style.display="block";
 
 document.getElementById("score").innerText="Score: "+score;
 
-/* 🎭 EMOJI SYSTEM */
 if(score>=2){
-document.getElementById("emoji").innerText="💃 Excellent Performance!";
+document.getElementById("emoji").innerText="💃 Excellent!";
 }
 else if(score>=1){
-document.getElementById("emoji").innerText="☺️ Average Performance";
-}
-else if(score>0){
-document.getElementById("emoji").innerText="🕺 Keep Trying!";
+document.getElementById("emoji").innerText="☺️ Average";
 }
 else{
 document.getElementById("emoji").innerText="😥 Need Improvement";
