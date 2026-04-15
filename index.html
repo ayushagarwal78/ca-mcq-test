@@ -1,59 +1,210 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>CA MCQ Test</title>
-</head>
-<body>
+<meta charset="UTF-8">
+<title>CA MCQ Exam Pro</title>
 
-  <h1>CA MCQ Test</h1>
-  <button onclick="startTest()">Start Test<button style="
-  background:#4CAF50;
-  color:white;
-  padding:10px 20px;
+<style>
+body{
+  font-family: Arial;
+  margin:0;
+  background: linear-gradient(135deg,#667eea,#764ba2);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.container{
+  background:white;
+  padding:25px;
+  border-radius:15px;
+  width:90%;
+  max-width:520px;
+  box-shadow:0 15px 30px rgba(0,0,0,0.3);
+}
+
+h1{
+  text-align:center;
+  color:#333;
+}
+
+#timer{
+  text-align:right;
+  font-weight:bold;
+  color:red;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
   border:none;
-  border-radius:8px;
+  border-radius:10px;
   cursor:pointer;
   font-size:16px;
-">
-Start Test
-</button>
+  transition:0.3s;
+}
 
-  <div id="quiz"></div>
-  <div id="result"></div>
+.start-btn{
+  background:#2ecc71;
+  color:white;
+}
 
-  <script>
-    let questions = [];
-    for (let i = 1; i <= 120; i++) {
-      questions.push({
-        q: "Question " + i,
-        options: ["A", "B", "C", "D"],
-        ans: 1
-      });
+.start-btn:hover{background:#27ae60;}
+
+.option{
+  background:#f2f2f2;
+}
+
+.option:hover{
+  background:#ddd;
+}
+
+.option.selected{
+  background:#b2bec3;
+}
+
+.next-btn{
+  background:#3498db;
+  color:white;
+}
+
+.submit-btn{
+  background:#e74c3c;
+  color:white;
+}
+
+.hide{display:none;}
+
+.result{
+  text-align:center;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>CA MCQ Exam Pro</h1>
+<div id="timer">Time: 60s</div>
+
+<div id="start">
+  <button class="start-btn" onclick="startTest()">Start Exam</button>
+</div>
+
+<div id="quiz" class="hide">
+
+  <h3 id="question"></h3>
+  <div id="options"></div>
+
+  <button class="next-btn" onclick="next()">Next</button>
+  <button class="submit-btn" onclick="finish()">Submit</button>
+
+</div>
+
+<div id="result" class="hide result">
+  <h2>Result</h2>
+  <h1 id="score"></h1>
+  <p id="grade"></p>
+  <button class="start-btn" onclick="location.reload()">Restart</button>
+</div>
+
+</div>
+
+<script>
+
+const questions = [
+  {q:"Capital of India?", options:["Mumbai","Delhi","Kolkata","Chennai"], answer:1},
+  {q:"2 + 2 = ?", options:["3","4","5","6"], answer:1},
+  {q:"CA stands for?", options:["Chartered Accountant","Company Agent","Cost Analyst","None"], answer:0},
+  {q:"5 x 5 = ?", options:["10","20","25","30"], answer:2}
+];
+
+let index = 0;
+let score = 0;
+let selected = -1;
+let time = 60;
+let timer;
+
+function startTest(){
+  document.getElementById("start").classList.add("hide");
+  document.getElementById("quiz").classList.remove("hide");
+  loadQuestion();
+  startTimer();
+}
+
+function startTimer(){
+  timer = setInterval(()=>{
+    time--;
+    document.getElementById("timer").innerText = "Time: " + time + "s";
+
+    if(time <= 0){
+      finish();
+    }
+  },1000);
+}
+
+function loadQuestion(){
+  selected = -1;
+
+  let q = questions[index];
+  document.getElementById("question").innerText = q.q;
+
+  let optDiv = document.getElementById("options");
+  optDiv.innerHTML = "";
+
+  q.options.forEach((o,i)=>{
+    let btn = document.createElement("button");
+    btn.innerText = o;
+    btn.classList.add("option");
+
+    btn.onclick = ()=>{
+      selected = i;
+      document.querySelectorAll(".option").forEach(b=>b.classList.remove("selected"));
+      btn.classList.add("selected");
     }
 
-    let answers = [];
+    optDiv.appendChild(btn);
+  });
+}
 
-    function startTest() {
-      let html = "";
-      questions.forEach((q, i) => {
-        html += `<p>${i+1}. ${q.q}</p>`;
-        q.options.forEach((opt, j) => {
-          html += `<input type='radio' name='q${i}' onclick='answers[${i}]=${j}'> ${opt}<br>`;
-        });
-      });
-      html += "<button onclick='submitTest()'>Submit</button>";
-      document.getElementById("quiz").innerHTML = html;
-    }
+function next(){
+  if(selected == questions[index].answer){
+    score++;
+  }
 
-    function submitTest() {
-      let score = 0;
-      questions.forEach((q, i) => {
-        if (answers[i] == q.ans) score++;
-        else if (answers[i] != undefined) score -= 0.25;
-      });
+  index++;
 
-      document.getElementById("result").innerHTML = "Score: " + score;
-    }
-  </script>
+  if(index < questions.length){
+    loadQuestion();
+  }else{
+    finish();
+  }
+}
+
+function finish(){
+  clearInterval(timer);
+
+  document.getElementById("quiz").classList.add("hide");
+  document.getElementById("result").classList.remove("hide");
+
+  document.getElementById("score").innerText =
+    score + " / " + questions.length;
+
+  let percent = (score/questions.length)*100;
+
+  let grade = "";
+  if(percent >= 80) grade = "🔥 Excellent";
+  else if(percent >= 50) grade = "👍 Good";
+  else grade = "📘 Need Improvement";
+
+  document.getElementById("grade").innerText = grade;
+}
+
+</script>
+
 </body>
 </html>
