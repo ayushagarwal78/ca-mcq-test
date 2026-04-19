@@ -1,51 +1,53 @@
-<!DOCTYPE html>
-<html lang="hi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MV Sir Classes - CA Foundation & Intermediate</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
 
-    <!-- Header Section -->
-    <header>
-        <div class="logo">MV SIR</div>
-        <nav>
-            <ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Books</a></li>
-                <li><a href="#">Classes</a></li>
-                <li><a href="#">About</a></li>
-            </ul>
-        </nav>
-        <button class="btn-login">Login</button>
-    </header>
+const quizData = [
+    {
+        question: "CA Foundation: GST kab lagu hua tha?",
+        options: ["1 July 2017", "1 April 2017", "1 July 2018", "1 Jan 2017"],
+        correct: 0
+    },
+    {
+        question: "Company Act 2013 mein total kitne sections hain?",
+        options: ["470", "450", "500", "480"],
+        correct: 0
+    }
+];
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <h1>CA Classes by MV Sir</h1>
-        <p>CA Foundation & Intermediate</p>
-        <button class="btn-enroll">Enroll Now</button>
-    </section>
+let currentQuestion = 0;
+let score = 0;
 
-    <!-- Products Section -->
-    <section class="products">
-        <h2>Our Best Sellers</h2>
-        <div class="product-grid">
-            <div class="product-card">
-                <img src="book1.jpg" alt="Book 1">
-                <h3>CA Inter FM/SM</h3>
-                <p>₹499</p>
-            </div>
-            <div class="product-card">
-                <img src="book2.jpg" alt="Book 2">
-                <h3>CA Foundation Eco</h3>
-                <p>₹599</p>
-            </div>
-        </div>
-    </section>
+function loadQuiz() {
+    const qText = document.getElementById("question-text");
+    const optContainer = document.getElementById("options-container");
+    optContainer.innerHTML = ""; // Purane options saaf karein
 
-</body>
-</html>
+    qText.innerText = quizData[currentQuestion].question;
+
+    quizData[currentQuestion].options.forEach((opt, index) => {
+        const btn = document.createElement("button");
+        btn.innerText = opt;
+        btn.classList.add("quiz-btn");
+        btn.onclick = () => checkAnswer(index);
+        optContainer.appendChild(btn);
+    });
+}
+
+function checkAnswer(selectedIndex) {
+    if (selectedIndex === quizData[currentQuestion].correct) {
+        score++;
+        alert("Sahi Jawab!");
+    } else {
+        alert("Galat! Sahi jawab tha: " + quizData[currentQuestion].options[quizData[currentQuestion].correct]);
+    }
+
+    currentQuestion++;
+    if (currentQuestion < quizData.length) {
+        loadQuiz();
+    } else {
+        document.getElementById("question-box").classList.add("hidden");
+        document.getElementById("result-box").classList.remove("hidden");
+        document.getElementById("score").innerText = score + "/" + quizData.length;
+    }
+}
+
+loadQuiz();
 
