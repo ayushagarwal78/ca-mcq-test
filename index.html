@@ -1,15 +1,226 @@
-<section id="quiz-container" class="quiz-section">
-    <h1 id="web-name">Apna CA Quiz Portal</h1> <!-- Yahan apna naam likhen -->
-    <div id="question-box">
-        <h2 id="question-text">Question loading...</h2>
-        <div id="options-container">
-            <!-- Options yahan dikhenge -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CA Foundation Eco Quiz</title>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --success: #00b894;
+            --error: #d63031;
+            --dark: #2d3436;
+            --light: #f9f9f9;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6c5ce7, #00d2ff);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
+        .quiz-container {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 10px;
+        }
+
+        .web-name { color: var(--primary); font-size: 1.5rem; font-weight: bold; }
+        .timer { background: var(--dark); color: white; padding: 5px 15px; border-radius: 50px; }
+
+        .question-area h2 { font-size: 1.2rem; margin-bottom: 20px; }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: var(--light);
+            border: 2px solid #ddd;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.3s;
+            text-align: left;
+        }
+
+        .option-btn:hover { border-color: var(--primary); background: #f0efff; }
+        .correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+
+        .footer { margin-top: 20px; font-weight: bold; }
+        .hidden { display: none; }
+        
+        .result-screen h1 { color: var(--primary); }
+        .restart-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <header>
+        <div class="web-name">CA ECO MASTERY</div>
+        <div class="timer">Time: <span id="time-left">15</span>s</div>
+    </header>
+
+    <!-- Quiz Screen -->
+    <div id="quiz-screen">
+        <div class="question-area">
+            <p id="q-number" style="color: gray;">Question 1 of 5</p>
+            <h2 id="question-text">Loading question...</h2>
+        </div>
+        <div class="options-grid" id="options-bin">
+            <!-- Buttons will appear here -->
         </div>
     </div>
-    <div id="result-box" class="hidden">
-        <h3>Aapka Score: <span id="score">0</span></h3>
-        <button onclick="location.reload()">Reset Quiz</button>
+
+    <!-- Result Screen -->
+    <div id="result-screen" class="hidden">
+        <h1>Quiz Completed! 🎉</h1>
+        <p>Aapka Total Score:</p>
+        <h2 id="final-score">0</h2>
+        <button class="restart-btn" onclick="location.reload()">Take Quiz Again</button>
     </div>
-</section>
+
+    <div class="footer" id="footer-info">Score: <span id="current-score">0</span></div>
+</div>
+
+<script>
+    const quizData = [
+        {
+            q: "Who is known as the Father of Economics?",
+            a: ["Adam Smith", "Alfred Marshall", "Lionel Robbins", "Samuelson"],
+            correct: 0
+        },
+        {
+            q: "Micro Economics deals with which of the following?",
+            a: ["National Income", "Individual Units", "Inflation", "Unemployment"],
+            correct: 1
+        },
+        {
+            q: "Law of Demand shows relationship between Price and Demand?",
+            a: ["Direct", "Inverse", "No Relation", "Proportional"],
+            correct: 1
+        },
+        {
+            q: "Which of the following is a 'Land' in Economics?",
+            a: ["Factory Building", "Machine", "Forest", "Roads"],
+            correct: 2
+        },
+        {
+            q: "Utility means _________?",
+            a: ["Usefulness", "Want satisfying power", "Happiness", "None"],
+            correct: 1
+        }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+    let timeLeft = 15;
+    let timer;
+
+    function startTimer() {
+        clearInterval(timer);
+        timeLeft = 15;
+        document.getElementById('time-left').innerText = timeLeft;
+        timer = setInterval(() => {
+            timeLeft--;
+            document.getElementById('time-left').innerText = timeLeft;
+            if(timeLeft <= 0) {
+                clearInterval(timer);
+                nextQuestion(); // Time khatam hone par agla question
+            }
+        }, 1000);
+    }
+
+    function loadQuestion() {
+        startTimer();
+        const qObj = quizData[currentQ];
+        document.getElementById('q-number').innerText = `Question ${currentQ + 1} of ${quizData.length}`;
+        document.getElementById('question-text').innerText = qObj.q;
+        
+        const bin = document.getElementById('options-bin');
+        bin.innerHTML = '';
+        
+        qObj.a.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.classList.add('option-btn');
+            btn.innerText = opt;
+            btn.onclick = () => checkAns(index, btn);
+            bin.appendChild(btn);
+        });
+    }
+
+    function checkAns(idx, btn) {
+        clearInterval(timer);
+        const correctIdx = quizData[currentQ].correct;
+        const allBtns = document.querySelectorAll('.option-btn');
+        
+        allBtns.forEach(b => b.style.pointerEvents = 'none'); // Disable more clicks
+
+        if(idx === correctIdx) {
+            btn.classList.add('correct');
+            score++;
+            document.getElementById('current-score').innerText = score;
+        } else {
+            btn.classList.add('wrong');
+            allBtns[correctIdx].classList.add('correct');
+        }
+
+        setTimeout(nextQuestion, 1500); // 1.5 second baad agla question
+    }
+
+    function nextQuestion() {
+        currentQ++;
+        if(currentQ < quizData.length) {
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('footer-info').classList.add('hidden');
+        document.getElementById('result-screen').classList.remove('hidden');
+        document.getElementById('final-score').innerText = `${score} / ${quizData.length}`;
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+    </html>
+
 
 
