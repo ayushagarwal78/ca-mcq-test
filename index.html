@@ -1,53 +1,15 @@
+<section id="quiz-container" class="quiz-section">
+    <h1 id="web-name">Apna CA Quiz Portal</h1> <!-- Yahan apna naam likhen -->
+    <div id="question-box">
+        <h2 id="question-text">Question loading...</h2>
+        <div id="options-container">
+            <!-- Options yahan dikhenge -->
+        </div>
+    </div>
+    <div id="result-box" class="hidden">
+        <h3>Aapka Score: <span id="score">0</span></h3>
+        <button onclick="location.reload()">Reset Quiz</button>
+    </div>
+</section>
 
-const quizData = [
-    {
-        question: "CA Foundation: GST kab lagu hua tha?",
-        options: ["1 July 2017", "1 April 2017", "1 July 2018", "1 Jan 2017"],
-        correct: 0
-    },
-    {
-        question: "Company Act 2013 mein total kitne sections hain?",
-        options: ["470", "450", "500", "480"],
-        correct: 0
-    }
-];
-
-let currentQuestion = 0;
-let score = 0;
-
-function loadQuiz() {
-    const qText = document.getElementById("question-text");
-    const optContainer = document.getElementById("options-container");
-    optContainer.innerHTML = ""; // Purane options saaf karein
-
-    qText.innerText = quizData[currentQuestion].question;
-
-    quizData[currentQuestion].options.forEach((opt, index) => {
-        const btn = document.createElement("button");
-        btn.innerText = opt;
-        btn.classList.add("quiz-btn");
-        btn.onclick = () => checkAnswer(index);
-        optContainer.appendChild(btn);
-    });
-}
-
-function checkAnswer(selectedIndex) {
-    if (selectedIndex === quizData[currentQuestion].correct) {
-        score++;
-        alert("Sahi Jawab!");
-    } else {
-        alert("Galat! Sahi jawab tha: " + quizData[currentQuestion].options[quizData[currentQuestion].correct]);
-    }
-
-    currentQuestion++;
-    if (currentQuestion < quizData.length) {
-        loadQuiz();
-    } else {
-        document.getElementById("question-box").classList.add("hidden");
-        document.getElementById("result-box").classList.remove("hidden");
-        document.getElementById("score").innerText = score + "/" + quizData.length;
-    }
-}
-
-loadQuiz();
 
