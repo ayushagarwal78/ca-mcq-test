@@ -1,210 +1,51 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MV Sir Classes - CA Foundation & Intermediate</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-<!-- LOGIN -->
-<div class="box" id="loginBox">
-<h1>📘 CA MCQ LOGIN</h1>
+    <!-- Header Section -->
+    <header>
+        <div class="logo">MV SIR</div>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Books</a></li>
+                <li><a href="#">Classes</a></li>
+                <li><a href="#">About</a></li>
+            </ul>
+        </nav>
+        <button class="btn-login">Login</button>
+    </header>
 
-<input id="phone" placeholder="📱 Phone"><br>
-<input id="email" placeholder="📧 Email"><br>
-<input id="otp" placeholder="Enter OTP"><br>
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>CA Classes by MV Sir</h1>
+        <p>CA Foundation & Intermediate</p>
+        <button class="btn-enroll">Enroll Now</button>
+    </section>
 
-<button class="start" onclick="sendOTP()">Send OTP</button>
-<button class="start" onclick="login()">Login</button>
-</div>
-
-<!-- START -->
-<div class="box" id="startBox" style="display:none;">
-<h1>🚀 CA Exam Portal</h1>
-<p id="status"></p>
-<button class="start" onclick="startTest()">Start Exam</button>
-</div>
-
-<!-- TEST -->
-<div class="box" id="testBox" style="display:none;">
-<h3>⏱ Time: <span id="time">100:00</span></h3>
-
-<h2 id="qno"></h2>
-<p id="question"></p>
-
-<div id="options"></div>
-
-<button class="next" onclick="nextQ()">Next</button>
-<button class="submit" onclick="submitTest()">Submit</button>
-</div>
-
-<!-- RESULT -->
-<div class="box" id="resultBox" style="display:none;">
-<h1>📊 Result</h1>
-<h2 id="score"></h2>
-<h1 id="emoji"></h1>
-</div>
-
-<script>
-
-/* ================= MCQ ================= */
-let questions=[
-{q:"2+2=?",o:["3","4","5","6"],a:1},
-{q:"Capital of India?",o:["Mumbai","Delhi","Kolkata","Chennai"],a:1},
-{q:"Depreciation kya hota hai?",o:["Increase","Decrease","Profit","Loan"],a:1}
-];
-
-let current=0;
-let ans=[];
-let time=6000;
-let otpCode="";
-
-/* ================= ADMIN ================= */
-let adminPhone="9999999999"; // 👉 तुम्हारा नंबर
-
-/* ================= OTP ================= */
-function sendOTP(){
-let phone=document.getElementById("phone").value;
-let email=document.getElementById("email").value;
-
-if(phone==""||email==""){
-alert("Fill all fields");
-return;
-}
-
-otpCode=Math.floor(100000+Math.random()*900000);
-alert("OTP sent to "+email+"\nOTP: "+otpCode);
-}
-
-/* ================= LOGIN ================= */
-function login(){
-let phone=document.getElementById("phone").value;
-let otp=document.getElementById("otp").value;
-
-if(otp!=otpCode){
-alert("Wrong OTP");
-return;
-}
-
-/* ADMIN FREE ACCESS */
-if(phone==adminPhone){
-localStorage.setItem("paid","true");
-document.getElementById("status").innerHTML="🟢 Admin Access (FREE)";
-}
-else{
-if(!localStorage.getItem("paid")){
-document.getElementById("status").innerHTML="🔴 Payment Required (₹99)";
-}
-}
-
-document.getElementById("loginBox").style.display="none";
-document.getElementById("startBox").style.display="block";
-}
-
-/* ================= PAYMENT ================= */
-function showPayment(){
-let ok=confirm("Pay ₹99 to unlock exam (Demo)");
-
-if(ok){
-localStorage.setItem("paid","true");
-alert("Payment Successful (Demo)");
-document.getElementById("status").innerHTML="🟢 Paid User";
-}
-}
-
-/* ================= START TEST ================= */
-function startTest(){
-
-/* LOCK CHECK */
-if(localStorage.getItem("paid")!="true"){
-alert("🔒 Exam Locked");
-showPayment();
-return;
-}
-
-document.getElementById("startBox").style.display="none";
-document.getElementById("testBox").style.display="block";
-
-loadQ();
-timer();
-}
-
-/* ================= LOAD QUESTION ================= */
-function loadQ(){
-let q=questions[current];
-
-document.getElementById("qno").innerText="Q"+(current+1);
-document.getElementById("question").innerText=q.q;
-
-let html="";
-q.o.forEach((v,i)=>{
-html+=`<div class='opt' onclick='select(this,${i})'>${v}</div>`;
-});
-
-document.getElementById("options").innerHTML=html;
-
-/* restore selection */
-setTimeout(()=>{
-let opts=document.querySelectorAll(".opt");
-opts.forEach(o=>o.classList.remove("selected"));
-
-if(ans[current]!=undefined){
-opts[ans[current]].classList.add("selected");
-}
-},50);
-}
-
-/* ================= SELECT ================= */
-function select(el,i){
-ans[current]=i;
-
-document.querySelectorAll(".opt").forEach(o=>o.classList.remove("selected"));
-el.classList.add("selected");
-}
-
-/* ================= NEXT ================= */
-function nextQ(){
-if(current<questions.length-1){
-current++;
-loadQ();
-}
-}
-
-/* ================= RESULT ================= */
-function submitTest(){
-let score=0;
-
-for(let i=0;i<questions.length;i++){
-if(ans[i]==questions[i].a) score++;
-else score-=0.25;
-}
-
-document.getElementById("testBox").style.display="none";
-document.getElementById("resultBox").style.display="block";
-
-document.getElementById("score").innerText="Score: "+score;
-
-/* 🕺 EMOJI */
-if(score>=2){
-document.getElementById("emoji").innerText="🕺 Excellent";
-}
-else if(score>=1){
-document.getElementById("emoji").innerText="🕺 Average";
-}
-else{
-document.getElementById("emoji").innerText="🕺 Need Improvement";
-}
-}
-
-/* ================= TIMER ================= */
-function timer(){
-setInterval(()=>{
-time--;
-let m=Math.floor(time/60);
-let s=time%60;
-
-document.getElementById("time").innerText=m+":"+s;
-
-if(time<=0){
-submitTest();
-}
-},1000);
-}
-
-</script>
+    <!-- Products Section -->
+    <section class="products">
+        <h2>Our Best Sellers</h2>
+        <div class="product-grid">
+            <div class="product-card">
+                <img src="book1.jpg" alt="Book 1">
+                <h3>CA Inter FM/SM</h3>
+                <p>₹499</p>
+            </div>
+            <div class="product-card">
+                <img src="book2.jpg" alt="Book 2">
+                <h3>CA Foundation Eco</h3>
+                <p>₹599</p>
+            </div>
+        </div>
+    </section>
 
 </body>
 </html>
+
